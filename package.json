@@ -1,8 +1,13 @@
 {
   "name": "dxdao-subgraph",
+  "description": "Subgraph for DXdao Governance",
+  "repository": {
+    "url": "https://github.com/DXgovernance/dxdao-subgraph"
+  },
   "version": "0.1.0",
   "scripts": {
-    "codegen": "graph codegen --output-dir src/types/",
+    "postinstall": "npm run codegen",
+    "codegen": "node scripts/generate-schema.js && node scripts/generate-subgraph.js && graph codegen --output-dir src/mappings",
     "build": "graph build",
     "create-local": "graph create mprasanjith/dxdao --node http://127.0.0.1:8020",
     "deploy-local": "graph deploy mprasanjith/dxdao --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020",
@@ -20,6 +25,7 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
-    "babel-register": "^6.26.0"
+    "babel-register": "^6.26.0",
+    "js-yaml": "^4.1.0"
   }
 }
