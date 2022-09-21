@@ -2,13 +2,12 @@
   "name": "dxdao-subgraph",
   "version": "0.1.0",
   "scripts": {
-    "build-contract": "solc contracts/Gravity.sol --abi -o abis --overwrite && solc contracts/Gravity.sol --bin -o bin --overwrite",
-    "create": "graph create dxgov/dxdao-subgraph --node https://api.thegraph.com/deploy/",
-    "create-local": "graph create dxgov/dxdao-subgraph --node http://127.0.0.1:8020",
-    "codegen": "graph codegen",
+    "codegen": "graph codegen --output-dir src/types/",
     "build": "graph build",
-    "deploy": "graph deploy dxgov/dxdao-subgraph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-local": "graph deploy dxgov/dxdao-subgraph --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020"
+    "create-local": "graph create dxdao --node http://127.0.0.1:8020",
+    "deploy-local": "graph deploy dxdao --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020",
+    "create": "graph create dxdao --node https://api.thegraph.com/deploy/",
+    "deploy": "graph deploy dxdao --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.30.2",
