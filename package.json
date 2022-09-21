@@ -4,20 +4,22 @@
   "scripts": {
     "codegen": "graph codegen --output-dir src/types/",
     "build": "graph build",
-    "create-local": "graph create dxdao --node http://127.0.0.1:8020",
-    "deploy-local": "graph deploy dxdao --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020",
-    "create": "graph create dxdao --node https://api.thegraph.com/deploy/",
-    "deploy": "graph deploy dxdao --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/"
+    "create-local": "graph create mprasanjith/dxdao --node http://127.0.0.1:8020",
+    "deploy-local": "graph deploy mprasanjith/dxdao --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020",
+    "create": "graph create mprasanjith/dxdao --node https://api.thegraph.com/deploy/",
+    "deploy": "graph deploy mprasanjith/dxdao --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.30.2",
-    "@graphprotocol/graph-ts": "^0.27.0"
+    "@graphprotocol/graph-ts": "^0.27.0",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "eslint": "^8.23.1",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.7.1"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
-    "babel-register": "^6.26.0",
-    "truffle": "^5.0.4",
-    "truffle-contract": "^4.0.5",
-    "truffle-hdwallet-provider": "^1.0.4"
+    "babel-register": "^6.26.0"
   }
 }
