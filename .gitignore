@@ -2,6 +2,7 @@ build/
 src/types/
 /schema.graphql
 /subgraph.yaml
+/data
 
 # Logs
 logs

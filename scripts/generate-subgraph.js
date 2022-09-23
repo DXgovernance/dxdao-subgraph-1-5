@@ -3,7 +3,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 const packageJson = require('../package.json');
 
-const network = 'mainnet';
+const network = 'private';
 
 /**
  * Generate a `subgraph.yaml` file from `datasource.yaml` fragments in
