@@ -1,0 +1,8 @@
+entities:
+  - Guild
+eventHandlers:
+  - event: AddGuild(address)
+    handler: handleAddGuild
+  - event: RemoveGuild(address)
+    handler: handleRemoveGuild
+

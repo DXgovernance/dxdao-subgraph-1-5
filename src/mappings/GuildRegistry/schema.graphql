@@ -1,0 +1,4 @@
+type Guild @entity {
+  id: ID!
+  isDeleted: Boolean!
+}
