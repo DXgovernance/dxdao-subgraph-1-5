@@ -1,4 +1,22 @@
 type Guild @entity {
   id: ID!
+  # name: String!
+  # proposalTime: Number!
+  # token: Token!
+  # uint256 _proposalTime
+  # string memory _name
+  # uint256 _lockTime,
+  # address _permissionRegistry,
+  # uint256 _timeForExecution,
+  # uint256 _votingPowerPercentageForProposalExecution,
+  # uint256 _votingPowerPercentageForProposalCreation,
+  # uint256 _voteGas,
+  # uint256 _maxGasPrice,
+  # uint256 _maxActiveProposals,
+  # uint256 _lockTime,
+  # uint256 _minimumMembersForProposalCreation,
+  # uint256 _minimumTokensLockedForProposalCreation,
+  # guildType: GuildType!
   isDeleted: Boolean!
+  # permissions: GuildPermission[]
 }

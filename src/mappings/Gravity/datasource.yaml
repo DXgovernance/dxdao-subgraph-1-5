@@ -1,8 +1,0 @@
-entities:
-  - Gravatar
-eventHandlers:
-  - event: NewGravatar(uint256,address,string,string)
-    handler: handleNewGravatar
-  - event: UpdatedGravatar(uint256,address,string,string)
-    handler: handleUpdatedGravatar
-

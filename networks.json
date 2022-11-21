@@ -3,10 +3,6 @@
     "GuildRegistry": {
       "address": "0xa19E7f8f6f064D1150c314897A32119d0299BA6b",
       "startBlock": 1
-    },
-    "Gravity": {
-      "address": "0x2E645469f354BB4F5c8a05B3b30A929361cf77eC",
-      "startBlock": 6175244
     }
   }
 }
