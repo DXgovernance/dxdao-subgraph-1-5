@@ -70,7 +70,7 @@ function combineFragments(addresses, contractName, isTemplate) {
 
   const usedContracts = [
     ...new Set(
-      fragmentFile.abis ? [contractName, fragmentFile.abis] : [contractName]
+      fragmentFile.abis ? [contractName, ...fragmentFile.abis] : [contractName]
     ),
   ];
   const abis = usedContracts.map(contractName => {
