@@ -6,6 +6,8 @@ For more information see the docs on https://thegraph.com/docs/.
 
 ## How to build
 
+You need to have `docker` and `docker-compose` installed
+
 After cloning the repo:
 
 ```sh
@@ -18,11 +20,25 @@ yarn build
 
 ```
 
+### Linux setup
+
+```
+sudo ./setup-linux.sh
+```
+
 ## How to deploy
 
 1. Follow the build steps above.
 
-2. 
+2. Set up the front-end repo and run it in the background
+
+3. Run docker
+
+```sh
+sudo docker compose up
+```
+
+4.
 
 ```sh
 # For local deployments
@@ -41,3 +57,4 @@ graph auth --product hosted-service <api-key>
 # 3. Deploy the subgraph
 yarn deploy
 ```
+
