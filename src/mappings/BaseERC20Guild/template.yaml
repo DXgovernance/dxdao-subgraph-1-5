@@ -9,3 +9,6 @@ eventHandlers:
     handler: handleTokenWithdrawal
   - event: VoteAdded(indexed bytes32,indexed uint256,address,uint256)
     handler: handleVoting
+callHandlers:
+  - function: setConfig(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+    handler: handleConfigChange
