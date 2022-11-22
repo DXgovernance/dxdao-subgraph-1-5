@@ -1,0 +1,15 @@
+type Proposal @entity {
+  id: ID!
+  creator: String!
+  startTime: BigInt!
+  endTime: BigInt!
+  to: [String!]
+  data: [String!]
+  value: [BigInt!]
+  title: String!
+  contentHash: String!
+  contractState: BigInt!
+  guildId: String!
+  totalVotes: [BigInt!]
+}
+

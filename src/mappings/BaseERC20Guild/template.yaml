@@ -1,5 +1,5 @@
 entities:
-  - Guild
+  - Proposal
 eventHandlers:
   - event: ProposalStateChanged(indexed bytes32,uint256)
     handler: handleProposalStateChange
@@ -12,3 +12,4 @@ eventHandlers:
 callHandlers:
   - function: setConfig(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
     handler: handleConfigChange
+
