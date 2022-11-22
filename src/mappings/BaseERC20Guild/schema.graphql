@@ -11,5 +11,14 @@ type Proposal @entity {
   contractState: BigInt!
   guildId: String!
   totalVotes: [BigInt!]
+  votes: [Vote!]
+}
+
+type Vote @entity {
+  id: ID!
+  proposalId: String!
+  option: BigInt!
+  voter: String!
+  votingPower: BigInt!
 }
 

@@ -1,5 +1,5 @@
 import { Bytes, Value } from '@graphprotocol/graph-ts';
-import { Guild, Proposal } from '../../types/schema';
+import { Guild, Proposal, Vote } from '../../types/schema';
 import {
   BaseERC20Guild,
   ProposalStateChanged,
@@ -44,7 +44,7 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
 
   const proposalData = contract.getProposal(event.params.proposalId);
 
-  if (proposal == null) {
+  if (!proposal) {
     proposal = new Proposal(event.params.proposalId.toHexString());
     proposal.guildId = address.toHexString();
     proposal.creator = proposalData.creator.toHexString();
@@ -56,6 +56,15 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
     proposal.title = proposalData.title;
     proposal.contentHash = proposalData.contentHash;
     proposal.totalVotes = proposalData.totalVotes;
+    proposal.votes = [];
+
+    let guild = Guild.load(address.toHexString());
+    if (guild) {
+      let proposalsCopy = guild.proposals;
+      proposalsCopy!.push(event.params.proposalId.toHexString());
+      guild.proposals = proposalsCopy;
+      guild.save();
+    }
   }
 
   proposal.contractState = event.params.newState;
@@ -66,5 +75,29 @@ export function handleTokenLocking(event: TokensLocked): void {}
 
 export function handleTokenWithdrawal(event: TokensWithdrawn): void {}
 
-export function handleVoting(event: VoteAdded): void {}
+export function handleVoting(event: VoteAdded): void {
+  const id = `${event.params.proposalId.toHexString()}-${event.params.voter.toHexString()}`;
+
+  let vote = Vote.load(id);
+  let proposal = Proposal.load(event.params.proposalId.toHexString());
+
+  if (!vote) {
+    vote = new Vote(id);
+    vote.proposalId = event.params.proposalId.toHexString();
+    vote.voter = event.params.voter.toHexString();
+    // TODO: change to event.params.option when merging refactor branch of dxdao-contracts
+    vote.option = event.params.action;
+    // TODO: check when one voter votes twice
+    if (proposal) {
+      let votesCopy = proposal.votes;
+      votesCopy!.push(id);
+      proposal.votes = votesCopy;
+      proposal.save();
+    }
+  }
+
+  vote.votingPower = event.params.votingPower;
+
+  vote.save();
+}
 

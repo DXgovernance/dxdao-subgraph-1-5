@@ -16,5 +16,6 @@ type Guild @entity {
   # guildType: GuildType!
   isDeleted: Boolean!
   # permissions: GuildPermission[]
+  proposals: [Proposal!]
 }
 

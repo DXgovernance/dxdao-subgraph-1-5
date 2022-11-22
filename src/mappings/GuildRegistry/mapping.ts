@@ -35,6 +35,8 @@ export function handleAddGuild(event: AddGuild): void {
   guild.minimumTokensLockedForProposalCreation =
     contract.getMinimumTokensLockedForProposalCreation();
   guild.isDeleted = false;
+  guild.proposals = [];
+
   guild.save();
 
   // Instantiate BaseERC20Guild instance
