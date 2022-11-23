@@ -14,7 +14,8 @@ type Proposal @entity {
   votes: [Vote!]
   options: [Option!]
   # TODO: use correct metadata type (ProposalMetadata)
-  metadata: Bytes
+  metadata: String
+  description: String
 }
 
 type Option @entity {

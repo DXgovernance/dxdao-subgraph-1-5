@@ -1,4 +1,4 @@
-import { Bytes, ipfs } from '@graphprotocol/graph-ts';
+import { ipfs, json, JSONValueKind } from '@graphprotocol/graph-ts';
 import { Guild, Proposal, Vote } from '../../types/schema';
 import {
   BaseERC20Guild,
@@ -60,7 +60,6 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
     proposal.totalVotes = proposalData.totalVotes;
     proposal.votes = [];
     proposal.options = [];
-    proposal.metadata = new Bytes(0);
 
     if (proposal.contentHash) {
       // TODO: find a way to decode contentHash
@@ -68,8 +67,19 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
       let metadata = ipfs.cat(
         'bafybeifbd6gebjnferqhqgb3vhrle7wt2qhrvdh7qji2xzr2wb5vxidva4'
       );
-      // TODO: get actual json content from metadata
-      proposal.metadata = metadata;
+      // TODO: parse JSON from metadata
+
+      if (metadata) {
+        const stringMetadata = metadata.toString();
+        const parsedJson = json.fromString(stringMetadata);
+        const parsedObject = parsedJson.toObject();
+        const description = parsedObject.get('description');
+        if (description && description.kind == JSONValueKind.STRING) {
+          proposal.description = description.toString();
+        }
+
+        proposal.metadata = stringMetadata;
+      }
     }
 
     let guild = Guild.load(address.toHexString());
