@@ -44,6 +44,7 @@ async function generateSubgraph(opts = {}) {
     description: packageJson.description,
     repository: packageJson.repository?.url,
     schema: { file: './schema.graphql' },
+    features: ['ipfsOnEthereumContracts'],
   };
   if (datasources.length > 0) subgraph.dataSources = datasources;
   if (templates.length > 0) subgraph.templates = templates;

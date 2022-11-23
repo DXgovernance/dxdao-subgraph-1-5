@@ -12,6 +12,29 @@ type Proposal @entity {
   guildId: String!
   totalVotes: [BigInt!]
   votes: [Vote!]
+  options: [Option!]
+  # TODO: use correct metadata type (ProposalMetadata)
+  metadata: Bytes
+}
+
+type Option @entity {
+  id: ID!
+  proposalId: String!
+  actions: [Action!]
+}
+
+type Action @entity {
+  id: ID!
+  optionId: String!
+  to: String!
+  data: String!
+  value: BigInt!
+  from: String!
+}
+type ProposalMetadata @entity {
+  id: ID!
+  description: String!
+  voteOptions: [String!]
 }
 
 type Vote @entity {
