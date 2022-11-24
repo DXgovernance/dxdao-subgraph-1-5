@@ -14,7 +14,7 @@ type Guild @entity {
   minimumMembersForProposalCreation: BigInt!
   minimumTokensLockedForProposalCreation: BigInt!
   # guildType: GuildType!
+  permissions: [GuildPermission!]! @derivedFrom(field: "guild")
   isDeleted: Boolean!
-  # permissions: GuildPermission[]
 }
 
