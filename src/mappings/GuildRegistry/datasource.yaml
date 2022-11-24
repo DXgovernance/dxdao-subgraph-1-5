@@ -1,5 +1,6 @@
 abis:
   - BaseERC20Guild
+  - ERC20
 entities:
   - Guild
 eventHandlers:
