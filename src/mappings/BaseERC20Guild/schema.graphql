@@ -14,13 +14,14 @@ type Proposal @entity {
   votes: [Vote!]
   options: [Option!]
   # TODO: use correct metadata type (ProposalMetadata)
-  # metadata: String
+  metadata: String
   description: String
 }
 
 type Option @entity {
   id: ID!
-  proposalId: String!
+  label: String
+  proposalId: String
   actions: [Action!]
 }
 

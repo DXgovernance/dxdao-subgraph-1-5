@@ -62,28 +62,34 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
     proposal.votes = [];
     proposal.options = [];
 
-    if (proposal.contentHash && isIPFS(proposal.contentHash)) {
-      // TODO: find a way to decode contentHash
-      // let metadata = ipfs.cat(proposal.contentHash);
-      // 'bafybeifbd6gebjnferqhqgb3vhrle7wt2qhrvdh7qji2xzr2wb5vxidva4'
+    // let voteOptionsLabel: string[] = [];
 
+    if (proposal.contentHash && isIPFS(proposal.contentHash)) {
       let metadata = ipfs.cat(
         proposal.contentHash.substring(7, proposal.contentHash.length + 1)
       );
 
-      // TODO: parse JSON from metadata
+      if (metadata) {
+        const stringMetadata = metadata.toString();
+        proposal.metadata = stringMetadata;
 
-      //   if (metadata) {
-      //     const stringMetadata = metadata.toString();
-      //     const parsedJson = json.fromString(stringMetadata);
-      //     const parsedObject = parsedJson.toObject();
-      //     const description = parsedObject.get('description');
-      //     if (description && description.kind == JSONValueKind.STRING) {
-      //       proposal.description = description.toString();
-      //     }
+        const parsedJson = json.fromString(stringMetadata);
+        const parsedObject = parsedJson.toObject();
+        const description = parsedObject.get('description');
+        const voteOptions = parsedObject.get('voteOptions');
 
-      //     proposal.metadata = stringMetadata;
-      //   }
+        if (description && description.kind == JSONValueKind.STRING) {
+          proposal.description = description.toString();
+        }
+
+        // if (voteOptions && voteOptions.kind == JSONValueKind.ARRAY) {
+        //   let newVoteOptions = voteOptions.toArray();
+
+        //   for (let k = 1; k < newVoteOptions.length; k++) {
+        //     voteOptionsLabel.push(newVoteOptions[k].toString());
+        //   }
+        // }
+      }
     }
 
     const amountOfOptions = proposal.totalVotes!.length - 1;
@@ -91,15 +97,17 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
 
     for (let i = 0; i < amountOfOptions; i++) {
       let optionId = `${proposalId}-${i}`;
+
       let option = new Option(optionId);
+
       let optionsCopy = proposal.options;
       optionsCopy!.push(`${proposalId}-${i}`);
       proposal.options = optionsCopy;
 
+      // if (voteOptionsLabel[i]) option.label = voteOptionsLabel[i];
+
       option.proposalId = proposalId;
       option.actions = [];
-
-      log.info('actionsPerOption: {}', [actionsPerOption.toString()]);
 
       for (let j = 0; j < actionsPerOption; j++) {
         if (option.actions) {
@@ -168,7 +176,7 @@ export function handleVoting(event: VoteAdded): void {
   vote.save();
 }
 
-function isIPFS(contentHash: string) {
+function isIPFS(contentHash: string): boolean {
   return contentHash.substring(0, 7) == 'ipfs://';
 }
 
