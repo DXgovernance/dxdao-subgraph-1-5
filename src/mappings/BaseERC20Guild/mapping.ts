@@ -1,4 +1,4 @@
-import { ipfs, json, JSONValueKind } from '@graphprotocol/graph-ts';
+import { ipfs, json, JSONValueKind, log } from '@graphprotocol/graph-ts';
 import { Guild, Proposal, Vote, Option, Action } from '../../types/schema';
 import {
   BaseERC20Guild,
@@ -62,44 +62,50 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
     proposal.votes = [];
     proposal.options = [];
 
-    // if (proposal.contentHash) {
-    //   // TODO: find a way to decode contentHash
-    //   // let metadata = ipfs.cat(proposal.contentHash);
-    //   let metadata = ipfs.cat(
-    //     'bafybeifbd6gebjnferqhqgb3vhrle7wt2qhrvdh7qji2xzr2wb5vxidva4'
-    //   );
-    //   // TODO: parse JSON from metadata
+    if (proposal.contentHash && isIPFS(proposal.contentHash)) {
+      // TODO: find a way to decode contentHash
+      // let metadata = ipfs.cat(proposal.contentHash);
+      // 'bafybeifbd6gebjnferqhqgb3vhrle7wt2qhrvdh7qji2xzr2wb5vxidva4'
 
-    //   if (metadata) {
-    //     const stringMetadata = metadata.toString();
-    //     const parsedJson = json.fromString(stringMetadata);
-    //     const parsedObject = parsedJson.toObject();
-    //     const description = parsedObject.get('description');
-    //     if (description && description.kind == JSONValueKind.STRING) {
-    //       proposal.description = description.toString();
-    //     }
+      let metadata = ipfs.cat(
+        proposal.contentHash.substring(7, proposal.contentHash.length + 1)
+      );
 
-    //     proposal.metadata = stringMetadata;
-    //   }
-    // }
+      // TODO: parse JSON from metadata
+
+      //   if (metadata) {
+      //     const stringMetadata = metadata.toString();
+      //     const parsedJson = json.fromString(stringMetadata);
+      //     const parsedObject = parsedJson.toObject();
+      //     const description = parsedObject.get('description');
+      //     if (description && description.kind == JSONValueKind.STRING) {
+      //       proposal.description = description.toString();
+      //     }
+
+      //     proposal.metadata = stringMetadata;
+      //   }
+    }
 
     const amountOfOptions = proposal.totalVotes!.length - 1;
     const actionsPerOption = proposal.data!.length / amountOfOptions;
 
-    for (let i = 0; i <= amountOfOptions; i++) {
+    for (let i = 0; i < amountOfOptions; i++) {
       let optionId = `${proposalId}-${i}`;
       let option = new Option(optionId);
       let optionsCopy = proposal.options;
       optionsCopy!.push(`${proposalId}-${i}`);
-
       proposal.options = optionsCopy;
+
       option.proposalId = proposalId;
       option.actions = [];
+
+      log.info('actionsPerOption: {}', [actionsPerOption.toString()]);
 
       for (let j = 0; j < actionsPerOption; j++) {
         if (option.actions) {
           let actionId = `${optionId}-${j}`;
-          let action = new Action(`${optionId}-${j}`);
+          let action = new Action(actionId);
+          action.optionId = optionId;
           let actionIndex = actionsPerOption * i + j;
 
           if (option.actions) {
@@ -108,11 +114,9 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
             action.to = to[actionIndex];
             action.value = proposalData.value[actionIndex];
           }
-
           let actionsCopy = option.actions;
           actionsCopy!.push(actionId);
           option.actions = actionsCopy;
-
           action.save();
         }
       }
@@ -162,5 +166,9 @@ export function handleVoting(event: VoteAdded): void {
   vote.votingPower = event.params.votingPower;
 
   vote.save();
+}
+
+function isIPFS(contentHash: string) {
+  return contentHash.substring(0, 7) == 'ipfs://';
 }
 
