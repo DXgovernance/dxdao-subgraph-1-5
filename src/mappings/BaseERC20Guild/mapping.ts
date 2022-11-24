@@ -1,5 +1,5 @@
 import { ipfs, json, JSONValueKind } from '@graphprotocol/graph-ts';
-import { Guild, Proposal, Vote } from '../../types/schema';
+import { Guild, Proposal, Vote, Option, Action } from '../../types/schema';
 import {
   BaseERC20Guild,
   ProposalStateChanged,
@@ -39,15 +39,16 @@ export function handleConfigChange(call: SetConfigCall): void {
 export function handleProposalStateChange(event: ProposalStateChanged): void {
   let address = event.address;
   let contract = BaseERC20Guild.bind(address);
+  const proposalId = event.params.proposalId.toHexString();
 
-  let proposal = Proposal.load(event.params.proposalId.toHexString());
+  let proposal = Proposal.load(proposalId);
 
   const proposalData = contract.getProposal(event.params.proposalId);
 
   if (!proposal) {
     const to = proposalData.to.map<string>(d => d.toHexString());
     const data = proposalData.data.map<string>(d => d.toHexString());
-    proposal = new Proposal(event.params.proposalId.toHexString());
+    proposal = new Proposal(proposalId);
     proposal.guildId = address.toHexString();
     proposal.creator = proposalData.creator.toHexString();
     proposal.startTime = proposalData.startTime;
@@ -61,31 +62,68 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
     proposal.votes = [];
     proposal.options = [];
 
-    if (proposal.contentHash) {
-      // TODO: find a way to decode contentHash
-      // let metadata = ipfs.cat(proposal.contentHash);
-      let metadata = ipfs.cat(
-        'bafybeifbd6gebjnferqhqgb3vhrle7wt2qhrvdh7qji2xzr2wb5vxidva4'
-      );
-      // TODO: parse JSON from metadata
+    // if (proposal.contentHash) {
+    //   // TODO: find a way to decode contentHash
+    //   // let metadata = ipfs.cat(proposal.contentHash);
+    //   let metadata = ipfs.cat(
+    //     'bafybeifbd6gebjnferqhqgb3vhrle7wt2qhrvdh7qji2xzr2wb5vxidva4'
+    //   );
+    //   // TODO: parse JSON from metadata
 
-      if (metadata) {
-        const stringMetadata = metadata.toString();
-        const parsedJson = json.fromString(stringMetadata);
-        const parsedObject = parsedJson.toObject();
-        const description = parsedObject.get('description');
-        if (description && description.kind == JSONValueKind.STRING) {
-          proposal.description = description.toString();
+    //   if (metadata) {
+    //     const stringMetadata = metadata.toString();
+    //     const parsedJson = json.fromString(stringMetadata);
+    //     const parsedObject = parsedJson.toObject();
+    //     const description = parsedObject.get('description');
+    //     if (description && description.kind == JSONValueKind.STRING) {
+    //       proposal.description = description.toString();
+    //     }
+
+    //     proposal.metadata = stringMetadata;
+    //   }
+    // }
+
+    const amountOfOptions = proposal.totalVotes!.length - 1;
+    const actionsPerOption = proposal.data!.length / amountOfOptions;
+
+    for (let i = 0; i <= amountOfOptions; i++) {
+      let optionId = `${proposalId}-${i}`;
+      let option = new Option(optionId);
+      let optionsCopy = proposal.options;
+      optionsCopy!.push(`${proposalId}-${i}`);
+
+      proposal.options = optionsCopy;
+      option.proposalId = proposalId;
+      option.actions = [];
+
+      for (let j = 0; j < actionsPerOption; j++) {
+        if (option.actions) {
+          let actionId = `${optionId}-${j}`;
+          let action = new Action(`${optionId}-${j}`);
+          let actionIndex = actionsPerOption * i + j;
+
+          if (option.actions) {
+            action.data = data[actionIndex];
+            action.from = address.toHexString();
+            action.to = to[actionIndex];
+            action.value = proposalData.value[actionIndex];
+          }
+
+          let actionsCopy = option.actions;
+          actionsCopy!.push(actionId);
+          option.actions = actionsCopy;
+
+          action.save();
         }
-
-        proposal.metadata = stringMetadata;
       }
+
+      option.save();
     }
 
     let guild = Guild.load(address.toHexString());
     if (guild) {
       let proposalsCopy = guild.proposals;
-      proposalsCopy!.push(event.params.proposalId.toHexString());
+      proposalsCopy!.push(proposalId);
       guild.proposals = proposalsCopy;
       guild.save();
     }
@@ -100,14 +138,15 @@ export function handleTokenLocking(event: TokensLocked): void {}
 export function handleTokenWithdrawal(event: TokensWithdrawn): void {}
 
 export function handleVoting(event: VoteAdded): void {
-  const id = `${event.params.proposalId.toHexString()}-${event.params.voter.toHexString()}`;
+  const proposalId = event.params.proposalId.toHexString();
+  const id = `${proposalId}-${event.params.voter.toHexString()}`;
 
   let vote = Vote.load(id);
-  let proposal = Proposal.load(event.params.proposalId.toHexString());
+  let proposal = Proposal.load(proposalId);
 
   if (!vote) {
     vote = new Vote(id);
-    vote.proposalId = event.params.proposalId.toHexString();
+    vote.proposalId = proposalId;
     vote.voter = event.params.voter.toHexString();
     // TODO: change to event.params.option when merging refactor branch of dxdao-contracts
     vote.option = event.params.action;

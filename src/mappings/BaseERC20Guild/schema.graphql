@@ -14,7 +14,7 @@ type Proposal @entity {
   votes: [Vote!]
   options: [Option!]
   # TODO: use correct metadata type (ProposalMetadata)
-  metadata: String
+  # metadata: String
   description: String
 }
 
@@ -32,11 +32,12 @@ type Action @entity {
   value: BigInt!
   from: String!
 }
-type ProposalMetadata @entity {
-  id: ID!
-  description: String!
-  voteOptions: [String!]
-}
+
+# type ProposalMetadata @entity {
+#   id: ID!
+#   description: String!
+#   voteOptions: [String!]
+# }
 
 type Vote @entity {
   id: ID!
