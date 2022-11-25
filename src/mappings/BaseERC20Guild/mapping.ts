@@ -1,4 +1,4 @@
-import { ipfs, json, JSONValueKind, log } from '@graphprotocol/graph-ts';
+import { ipfs, json, JSONValueKind, BigInt } from '@graphprotocol/graph-ts';
 import { Guild, Proposal, Vote, Option, Action } from '../../types/schema';
 import {
   BaseERC20Guild,
@@ -85,7 +85,7 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
         if (voteOptions && voteOptions.kind == JSONValueKind.ARRAY) {
           let newVoteOptions = voteOptions.toArray();
 
-          for (let k = 1; k < newVoteOptions.length; k++) {
+          for (let k = 0; k < newVoteOptions.length; k++) {
             let voteOptionsLabelCopy = voteOptionsLabel;
             voteOptionsLabelCopy.push(newVoteOptions[k].toString());
             voteOptionsLabel = voteOptionsLabelCopy;
@@ -94,8 +94,9 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
       }
     }
 
-    const amountOfOptions = proposal.totalVotes!.length - 1;
-    const actionsPerOption = proposal.data!.length / amountOfOptions;
+    const amountOfOptions = proposal.totalVotes!.length;
+    // proposal.data does not contain actions for 0 option so we don't count it on the div to get actionsCount
+    const actionsPerOption = proposal.data!.length / (amountOfOptions - 1);
 
     for (let i = 0; i < amountOfOptions; i++) {
       let optionId = `${proposalId}-${i}`;
@@ -103,21 +104,29 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
       let option = new Option(optionId);
 
       let optionsCopy = proposal.options;
-      optionsCopy!.push(`${proposalId}-${i}`);
+      optionsCopy!.push(optionId);
       proposal.options = optionsCopy;
 
-      if (voteOptionsLabel.length == amountOfOptions && voteOptionsLabel[i])
-        option.label = voteOptionsLabel[i];
+      if (voteOptionsLabel.length == amountOfOptions) {
+        if (i == 0) {
+          option.label = 'Against'; // TODO: Should we hardcode this here or send empty string to FE?
+        } else {
+          option.label = voteOptionsLabel[i];
+        }
+      }
 
       option.proposalId = proposalId;
       option.actions = [];
+      option.votes = [];
+      option.voteAmount = new BigInt(0);
 
-      for (let j = 0; j < actionsPerOption; j++) {
-        if (option.actions) {
+      // Skip Option zero and return actions []
+      if (i > 0) {
+        for (let j = 0; j < actionsPerOption; j++) {
           let actionId = `${optionId}-${j}`;
           let action = new Action(actionId);
           action.optionId = optionId;
-          let actionIndex = actionsPerOption * i + j;
+          let actionIndex = actionsPerOption * (i - 1) + j;
 
           if (option.actions) {
             action.data = data[actionIndex];
@@ -154,13 +163,16 @@ export function handleTokenWithdrawal(event: TokensWithdrawn): void {}
 
 export function handleVoting(event: VoteAdded): void {
   const proposalId = event.params.proposalId.toHexString();
-  const id = `${proposalId}-${event.params.voter.toHexString()}`;
+  const voteId = `${proposalId}-${event.params.voter.toHexString()}`;
 
-  let vote = Vote.load(id);
+  let contract = BaseERC20Guild.bind(event.address);
+  const proposalData = contract.getProposal(event.params.proposalId);
+
+  let vote = Vote.load(voteId);
   let proposal = Proposal.load(proposalId);
 
   if (!vote) {
-    vote = new Vote(id);
+    vote = new Vote(voteId);
     vote.proposalId = proposalId;
     vote.voter = event.params.voter.toHexString();
     // TODO: change to event.params.option when merging refactor branch of dxdao-contracts
@@ -168,12 +180,29 @@ export function handleVoting(event: VoteAdded): void {
     // TODO: check when one voter votes twice
     if (proposal) {
       let votesCopy = proposal.votes;
-      votesCopy!.push(id);
+      votesCopy!.push(voteId);
       proposal.votes = votesCopy;
+
+      const newTotalVotes = proposalData.totalVotes;
+      proposal.totalVotes = newTotalVotes;
+
+      let optionId = `${proposalId}-${event.params.action}`;
+      let option = Option.load(optionId);
+      // update option data on vote event
+      if (!!option) {
+        let optionVotesCopy = option.votes;
+        const newVoteAmount = newTotalVotes[event.params.action.toI32()];
+        optionVotesCopy.push(voteId);
+
+        option.voteAmount = newVoteAmount;
+        option.votes = optionVotesCopy;
+        option.save();
+      }
+
       proposal.save();
     }
   }
-
+  // TODO: if vote exists update option.voteAmount and push new vote(?)
   vote.votingPower = event.params.votingPower;
 
   vote.save();

@@ -23,6 +23,8 @@ type Option @entity {
   label: String
   proposalId: String
   actions: [Action!]
+  voteAmount: BigInt
+  votes: [Vote!]!
 }
 
 type Action @entity {
