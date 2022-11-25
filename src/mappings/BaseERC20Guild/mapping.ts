@@ -62,7 +62,7 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
     proposal.votes = [];
     proposal.options = [];
 
-    // let voteOptionsLabel: string[] = [];
+    let voteOptionsLabel: string[] = [];
 
     if (proposal.contentHash && isIPFS(proposal.contentHash)) {
       let metadata = ipfs.cat(
@@ -82,13 +82,15 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
           proposal.description = description.toString();
         }
 
-        // if (voteOptions && voteOptions.kind == JSONValueKind.ARRAY) {
-        //   let newVoteOptions = voteOptions.toArray();
+        if (voteOptions && voteOptions.kind == JSONValueKind.ARRAY) {
+          let newVoteOptions = voteOptions.toArray();
 
-        //   for (let k = 1; k < newVoteOptions.length; k++) {
-        //     voteOptionsLabel.push(newVoteOptions[k].toString());
-        //   }
-        // }
+          for (let k = 1; k < newVoteOptions.length; k++) {
+            let voteOptionsLabelCopy = voteOptionsLabel;
+            voteOptionsLabelCopy.push(newVoteOptions[k].toString());
+            voteOptionsLabel = voteOptionsLabelCopy;
+          }
+        }
       }
     }
 
@@ -104,7 +106,8 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
       optionsCopy!.push(`${proposalId}-${i}`);
       proposal.options = optionsCopy;
 
-      // if (voteOptionsLabel[i]) option.label = voteOptionsLabel[i];
+      if (voteOptionsLabel.length == amountOfOptions && voteOptionsLabel[i])
+        option.label = voteOptionsLabel[i];
 
       option.proposalId = proposalId;
       option.actions = [];
