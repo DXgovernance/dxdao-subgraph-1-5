@@ -49,6 +49,7 @@ export function handleAddGuild(event: AddGuild): void {
     contract.getMinimumTokensLockedForProposalCreation();
   guild.token = token.id;
   guild.isDeleted = false;
+  guild.proposals = [];
 
   guild.save();
 
