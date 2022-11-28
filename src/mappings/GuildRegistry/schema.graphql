@@ -1,7 +1,7 @@
 type Guild @entity {
   id: ID!
   name: String!
-  token: String!
+  token: Token
   permissionRegistry: String!
   proposalTime: BigInt!
   lockTime: BigInt!
@@ -14,7 +14,19 @@ type Guild @entity {
   minimumMembersForProposalCreation: BigInt!
   minimumTokensLockedForProposalCreation: BigInt!
   # guildType: GuildType!
+  permissions: [GuildPermission!]! @derivedFrom(field: "guild")
   isDeleted: Boolean!
-  # permissions: GuildPermission[]
+}
+
+enum TokenType {
+  ERC20
+}
+
+type Token @entity {
+  id: ID!
+  type: TokenType!
+  name: String!
+  symbol: String!
+  decimals: Int!
 }
 
