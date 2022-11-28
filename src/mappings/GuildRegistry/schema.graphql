@@ -15,7 +15,7 @@ type Guild @entity {
   minimumTokensLockedForProposalCreation: BigInt!
   # guildType: GuildType!
   permissions: [GuildPermission!]! @derivedFrom(field: "guild")
-  isDeleted: Boolean!
+  proposals: [Proposal!]
 }
 
 enum TokenType {
@@ -28,5 +28,6 @@ type Token @entity {
   name: String!
   symbol: String!
   decimals: Int!
+  # permissions: GuildPermission[]
 }
 
