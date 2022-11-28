@@ -1,5 +1,12 @@
 import { ipfs, json, JSONValueKind, BigInt } from '@graphprotocol/graph-ts';
-import { Guild, Proposal, Vote, Option, Action } from '../../types/schema';
+import {
+  Guild,
+  Proposal,
+  Vote,
+  Option,
+  Action,
+  ProposalStateLog,
+} from '../../types/schema';
 import {
   BaseERC20Guild,
   ProposalStateChanged,
@@ -61,6 +68,7 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
     proposal.totalVotes = proposalData.totalVotes;
     proposal.votes = [];
     proposal.options = [];
+    proposal.statesLog = [];
 
     let voteOptionsLabel: string[] = [];
 
@@ -153,6 +161,17 @@ export function handleProposalStateChange(event: ProposalStateChanged): void {
     }
   }
 
+  // executed
+  if (event.params.newState.toString() == '3') {
+    proposal.executionTransactionHash = event.transaction.hash.toHexString();
+  }
+
+  // let proposalStateLog = new ProposalStateLog();
+  // proposalStateLog.
+
+  // let proposalStatesLogCopy = proposal.statesLog;
+  // proposalStatesLogCopy?.push()
+
   proposal.contractState = event.params.newState;
   proposal.save();
 }
@@ -204,6 +223,7 @@ export function handleVoting(event: VoteAdded): void {
   }
   // TODO: if vote exists update option.voteAmount and push new vote(?)
   vote.votingPower = event.params.votingPower;
+  vote.transactionHash = event.transaction.hash.toHexString();
 
   vote.save();
 }

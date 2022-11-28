@@ -16,6 +16,14 @@ type Proposal @entity {
   # TODO: use correct metadata type (ProposalMetadata)
   metadata: String
   description: String
+  executionTransactionHash: String
+  statesLog: [ProposalStateLog!]
+}
+
+type ProposalStateLog @entity {
+  id: ID!
+  state: BigInt!
+  timestamp: Int
 }
 
 type Option @entity {
@@ -48,5 +56,6 @@ type Vote @entity {
   option: BigInt!
   voter: String!
   votingPower: BigInt!
+  transactionHash: String!
 }
 
