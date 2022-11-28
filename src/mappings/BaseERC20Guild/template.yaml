@@ -3,6 +3,7 @@ entities:
   - Vote
   - Option
   - Action
+  - Member
 eventHandlers:
   - event: ProposalStateChanged(indexed bytes32,uint256)
     handler: handleProposalStateChange

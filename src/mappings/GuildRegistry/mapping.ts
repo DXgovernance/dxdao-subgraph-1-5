@@ -50,6 +50,7 @@ export function handleAddGuild(event: AddGuild): void {
   guild.token = token.id;
   guild.isDeleted = false;
   guild.proposals = [];
+  guild.members = [];
 
   guild.save();
 
