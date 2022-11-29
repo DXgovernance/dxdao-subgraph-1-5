@@ -1,15 +1,11 @@
 import { log } from '@graphprotocol/graph-ts';
-import { Transfer } from '../../types/GuildRegistry/ERC20';
 import { Guild, Member, Token } from '../../types/schema';
+import { Transfer } from '../../types/templates/ERC20SnapshotRep/ERC20SnapshotRep';
 
 export function handleTransfer(event: Transfer): void {
   let tokenAddress = event.address;
 
   let token = Token.load(tokenAddress.toHexString());
-  log.info(`guildAddress {}`, [token!.guildAddress]);
-  log.info(`*************************`, []);
-  log.info(`*************************`, []);
-  log.info(`*************************`, []);
 
   const guild = Guild.load(token!.guildAddress);
   // const guild = Guild.load('0x140d68e4e3f80cdcf7036de007b3bcec54d38b1f');
@@ -17,7 +13,14 @@ export function handleTransfer(event: Transfer): void {
   const zeroAddress = '0x0000000000000000000000000000000000000000';
   let memberId = '';
 
-  if (!guild) return;
+  // TODO: change to !guild.isREPGuild
+  if (!guild || guild.id !== '0x140d68e4e3f80cdcf7036de007b3bcec54d38b1f')
+    return;
+
+  log.info(`guildAddress {}`, [token!.guildAddress]);
+  log.info(`-------------------------`, []);
+  log.info(`-------------------------`, []);
+  log.info(`-------------------------`, []);
 
   const isMint = event.params.from.toHexString() === zeroAddress;
 
