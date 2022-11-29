@@ -1,9 +1,6 @@
 import { log } from '@graphprotocol/graph-ts';
+import { Transfer } from '../../types/GuildRegistry/ERC20';
 import { Guild, Member, Token } from '../../types/schema';
-import {
-  BaseERC20Guild,
-  Transfer,
-} from '../../types/templates/BaseERC20Guild/BaseERC20Guild';
 
 export function handleTransfer(event: Transfer): void {
   let tokenAddress = event.address;
