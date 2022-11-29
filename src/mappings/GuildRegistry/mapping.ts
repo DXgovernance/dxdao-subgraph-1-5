@@ -1,5 +1,8 @@
 import { AddGuild, RemoveGuild } from '../../types/GuildRegistry/GuildRegistry';
-import { BaseERC20Guild as BaseERC20GuildTemplate } from '../../types/templates';
+import {
+  BaseERC20Guild as BaseERC20GuildTemplate,
+  ERC20SnapshotRep,
+} from '../../types/templates';
 import { Guild, Token } from '../../types/schema';
 import { BaseERC20Guild } from '../../types/templates/BaseERC20Guild/BaseERC20Guild';
 import { ERC20 } from '../../types/GuildRegistry/ERC20';
@@ -20,6 +23,8 @@ export function handleAddGuild(event: AddGuild): void {
   token.type = 'ERC20';
   token.symbol = tokenContract.symbol();
   token.decimals = tokenContract.decimals();
+  token.guildAddress = address.toHexString();
+
   token.save();
 
   // Create Guild instance.
@@ -57,6 +62,7 @@ export function handleAddGuild(event: AddGuild): void {
   // Instantiate BaseERC20Guild instance
   // TODO: Instantiate the right type of guild instead of base contract.
   BaseERC20GuildTemplate.create(address);
+  ERC20SnapshotRep.create(tokenAddress);
 }
 
 export function handleRemoveGuild(event: RemoveGuild): void {

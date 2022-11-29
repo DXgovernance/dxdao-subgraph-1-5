@@ -234,10 +234,6 @@ export function handleVoting(event: VoteAdded): void {
   vote.save();
 }
 
-function isIPFS(contentHash: string): boolean {
-  return contentHash.substring(0, 7) == 'ipfs://';
-}
-
 export function handleTokenLocking(event: TokensLocked): void {
   let guildAddress = event.address;
   let contract = BaseERC20Guild.bind(guildAddress);
@@ -246,7 +242,7 @@ export function handleTokenLocking(event: TokensLocked): void {
 
   if (!guild) return;
 
-  const memberId = `${guildAddress}-${event.params.voter}`;
+  const memberId = `${guildAddress.toHexString()}-${event.params.voter.toHexString()}`;
 
   let member = Member.load(memberId);
 
@@ -254,7 +250,7 @@ export function handleTokenLocking(event: TokensLocked): void {
     member = new Member(memberId);
     member.address = event.params.voter.toHexString();
 
-    let guildMembersClone = guild!.members;
+    let guildMembersClone = guild.members;
     guildMembersClone!.push(memberId);
     guild.members = guildMembersClone;
     guild.save();
@@ -273,19 +269,28 @@ export function handleTokenWithdrawal(event: TokensWithdrawn): void {
 
   if (!guild) return;
 
-  const memberId = `${guildAddress}-${event.params.voter}`;
+  const memberId = `${guildAddress.toHexString()}-${event.params.voter.toHexString()}`;
 
   let member = Member.load(memberId);
 
   member!.tokensLocked = contract.votingPowerOf(event.params.voter);
 
   if (member!.tokensLocked == new BigInt(0)) {
-    let guildMembersClone = guild!.members;
-    guildMembersClone!.filter(m => m !== member!.address);
+    let guildMembersClone = guild.members;
+    for (let i = 0; i < guildMembersClone!.length; i++) {
+      if (guildMembersClone![i] === member!.address) {
+        guildMembersClone!.splice(i, 1);
+      }
+    }
     guild.members = guildMembersClone;
+
     guild.save();
   }
 
   member!.unset(memberId);
+}
+
+function isIPFS(contentHash: string): boolean {
+  return contentHash.substring(0, 7) == 'ipfs://';
 }
 
