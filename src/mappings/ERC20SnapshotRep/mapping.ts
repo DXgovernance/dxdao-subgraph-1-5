@@ -1,52 +1,45 @@
-import { log } from '@graphprotocol/graph-ts';
+import { BigInt } from '@graphprotocol/graph-ts';
 import { Guild, Member, Token } from '../../types/schema';
 import { Transfer } from '../../types/templates/ERC20SnapshotRep/ERC20SnapshotRep';
 
 export function handleTransfer(event: Transfer): void {
-  let tokenAddress = event.address;
-
-  let token = Token.load(tokenAddress.toHexString());
-
+  let tokenAddress = event.address.toHexString();
+  let token = Token.load(tokenAddress);
   const guild = Guild.load(token!.guildAddress);
-  // const guild = Guild.load('0x140d68e4e3f80cdcf7036de007b3bcec54d38b1f');
 
   const zeroAddress = '0x0000000000000000000000000000000000000000';
-  let memberId = '';
 
   // TODO: change to !guild.isREPGuild
-  if (!guild || guild.id !== '0x140d68e4e3f80cdcf7036de007b3bcec54d38b1f')
+  if (!guild || tokenAddress != '0x7bc0dedafd60611d430c89353cc30e1a11b90ac7') {
     return;
+  }
 
-  log.info(`guildAddress {}`, [token!.guildAddress]);
-  log.info(`-------------------------`, []);
-  log.info(`-------------------------`, []);
-  log.info(`-------------------------`, []);
+  if (!guild) return;
 
-  const isMint = event.params.from.toHexString() === zeroAddress;
+  const isMint = event.params.from.toHexString() == zeroAddress;
 
-  memberId = `${token!.guildAddress}-${
+  let memberId = `${token!.guildAddress}-${
     isMint ? event.params.to.toHexString() : event.params.from.toHexString()
   }`;
   let member = Member.load(memberId);
 
-  // if (isMint) {
-  // mint
-  if (!member) {
-    member = new Member(memberId);
-    member.address = event.params.to.toHexString();
+  if (isMint) {
+    if (!member) {
+      member = new Member(memberId);
+      member.address = event.params.to.toHexString();
+      member.tokensLocked = new BigInt(0);
 
-    let guildMembersClone = guild.members;
-    guildMembersClone!.push(memberId);
-    guild.members = guildMembersClone;
+      let guildMembersClone = guild.members;
+      guildMembersClone!.push(memberId);
+      guild.members = guildMembersClone;
 
-    guild.save();
+      guild.save();
+    }
+
+    member.save();
   }
-  // TODO: change to get from contract
-  member.tokensLocked = event.params.value;
-  member.save();
-  // } else {
-  //   // burn
-  //   memberId = `${guildAddress.toHexString()}-${event.params.to}`;
-  // }
+
+  // TODO: handle burn logic
+  // TODO: get voting power of member
 }
 
