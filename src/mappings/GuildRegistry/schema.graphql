@@ -16,6 +16,7 @@ type Guild @entity {
   # guildType: GuildType!
   permissions: [GuildPermission!]! @derivedFrom(field: "guild")
   proposals: [Proposal!]
+  isDeleted: Boolean
 }
 
 enum TokenType {
