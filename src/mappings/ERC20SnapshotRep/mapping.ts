@@ -1,11 +1,16 @@
-import { BigInt } from '@graphprotocol/graph-ts';
+import { Address, BigInt, log } from '@graphprotocol/graph-ts';
 import { Guild, Member, Token } from '../../types/schema';
-import { Transfer } from '../../types/templates/ERC20SnapshotRep/ERC20SnapshotRep';
+import {
+  ERC20SnapshotRep,
+  Transfer,
+} from '../../types/templates/ERC20SnapshotRep/ERC20SnapshotRep';
 
 export function handleTransfer(event: Transfer): void {
   let tokenAddress = event.address.toHexString();
   let token = Token.load(tokenAddress);
   const guild = Guild.load(token!.guildAddress);
+
+  let tokenContract = ERC20SnapshotRep.bind(event.address);
 
   const zeroAddress = '0x0000000000000000000000000000000000000000';
 
@@ -18,28 +23,29 @@ export function handleTransfer(event: Transfer): void {
 
   const isMint = event.params.from.toHexString() == zeroAddress;
 
-  let memberId = `${token!.guildAddress}-${
-    isMint ? event.params.to.toHexString() : event.params.from.toHexString()
-  }`;
+  const memberAddress = isMint
+    ? event.params.to.toHexString()
+    : event.params.from.toHexString();
+
+  let memberId = `${token!.guildAddress}-${memberAddress}`;
   let member = Member.load(memberId);
 
-  if (isMint) {
-    if (!member) {
-      member = new Member(memberId);
-      member.address = event.params.to.toHexString();
-      member.tokensLocked = new BigInt(0);
+  if (!member) {
+    member = new Member(memberId);
+    member.address = event.params.to.toHexString();
+    member.tokensLocked = new BigInt(0);
 
-      let guildMembersClone = guild.members;
-      guildMembersClone!.push(memberId);
-      guild.members = guildMembersClone;
+    let guildMembersClone = guild.members;
+    guildMembersClone!.push(memberId);
+    guild.members = guildMembersClone;
 
-      guild.save();
-    }
-
-    member.save();
+    guild.save();
   }
 
-  // TODO: handle burn logic
-  // TODO: get voting power of member
+  member.tokensLocked = tokenContract.balanceOf(
+    Address.fromString(member.address)
+  );
+
+  member.tokensLocked > new BigInt(0) ? member.save() : member.unset(memberId);
 }
 
