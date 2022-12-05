@@ -57,12 +57,16 @@ export function handleAddGuild(event: AddGuild): void {
   guild.proposals = [];
   guild.members = [];
 
-  guild.save();
+  if (guild.name == 'REPGuild') {
+    guild.guildType = 'Rep';
+    ERC20SnapshotRep.create(tokenAddress);
+  } else {
+    guild.guildType = 'Base';
+  }
 
-  // Instantiate BaseERC20Guild instance
-  // TODO: Instantiate the right type of guild instead of base contract.
   BaseERC20GuildTemplate.create(address);
-  ERC20SnapshotRep.create(tokenAddress);
+
+  guild.save();
 }
 
 export function handleRemoveGuild(event: RemoveGuild): void {

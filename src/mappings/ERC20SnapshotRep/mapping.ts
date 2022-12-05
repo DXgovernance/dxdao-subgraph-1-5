@@ -14,12 +14,9 @@ export function handleTransfer(event: Transfer): void {
 
   const zeroAddress = '0x0000000000000000000000000000000000000000';
 
-  // TODO: change to !guild.isREPGuild
-  if (!guild || tokenAddress != '0x7bc0dedafd60611d430c89353cc30e1a11b90ac7') {
+  if (!guild || guild.guildType != 'Rep') {
     return;
   }
-
-  if (!guild) return;
 
   const isMint = event.params.from.toHexString() == zeroAddress;
 
