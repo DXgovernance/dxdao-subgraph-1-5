@@ -46,6 +46,19 @@ export function handleTransfer(event: Transfer): void {
     Address.fromString(member.address)
   );
 
-  member.tokensLocked > new BigInt(0) ? member.save() : member.unset(memberId);
+  if (member.tokensLocked > new BigInt(0)) {
+    member.save();
+  } else {
+    let guildMembersClone = guild.members;
+    for (let i = 0; i < guildMembersClone!.length; i++) {
+      if (guildMembersClone![i] == memberId) {
+        guildMembersClone!.splice(i, 1);
+      }
+    }
+    guild.members = guildMembersClone;
+
+    guild.save();
+    member.unset(memberId);
+  }
 }
 

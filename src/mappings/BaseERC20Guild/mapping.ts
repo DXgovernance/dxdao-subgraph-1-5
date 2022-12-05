@@ -278,7 +278,7 @@ export function handleTokenWithdrawal(event: TokensWithdrawn): void {
   if (member!.tokensLocked == new BigInt(0)) {
     let guildMembersClone = guild.members;
     for (let i = 0; i < guildMembersClone!.length; i++) {
-      if (guildMembersClone![i] === member!.address) {
+      if (guildMembersClone![i] == memberId) {
         guildMembersClone!.splice(i, 1);
       }
     }
