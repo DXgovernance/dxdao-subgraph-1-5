@@ -58,10 +58,11 @@ export function handleAddGuild(event: AddGuild): void {
   guild.members = [];
 
   if (guild.name == 'REPGuild') {
-    guild.guildType = 'Rep';
+    guild.type = 'SnapshotRepERC20Guild';
     ERC20SnapshotRep.create(tokenAddress);
+    // TODO: add more conditionals to support
   } else {
-    guild.guildType = 'Base';
+    guild.type = 'ERC20Guild';
   }
 
   BaseERC20GuildTemplate.create(address);

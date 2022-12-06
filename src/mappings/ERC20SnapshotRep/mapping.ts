@@ -14,7 +14,7 @@ export function handleTransfer(event: Transfer): void {
 
   const zeroAddress = '0x0000000000000000000000000000000000000000';
 
-  if (!guild || guild.guildType != 'Rep') {
+  if (!guild || guild.type != 'SnapshotRepERC20Guild') {
     return;
   }
 

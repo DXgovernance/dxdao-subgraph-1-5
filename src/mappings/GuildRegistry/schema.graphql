@@ -13,7 +13,7 @@ type Guild @entity {
   maxActiveProposals: BigInt!
   minimumMembersForProposalCreation: BigInt!
   minimumTokensLockedForProposalCreation: BigInt!
-  guildType: GuildType!
+  type: GuildType!
   permissions: [GuildPermission!]! @derivedFrom(field: "guild")
   proposals: [Proposal!]
   isDeleted: Boolean!
@@ -25,9 +25,10 @@ enum TokenType {
 }
 
 enum GuildType {
-  Rep
-  Snapshot
-  Base
+  ERC20Guild
+  DXDGuild
+  SnapshotRepERC20Guild
+  SnapshotERC20Guild
 }
 
 type Token @entity {
