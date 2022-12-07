@@ -23,7 +23,8 @@ type Proposal @entity {
 type ProposalStateLog @entity {
   id: ID!
   state: BigInt!
-  timestamp: Int
+  timestamp: BigInt!
+  transactionHash: String!
 }
 
 type Option @entity {
@@ -57,5 +58,11 @@ type Vote @entity {
   voter: String!
   votingPower: BigInt!
   transactionHash: String!
+}
+
+type Member @entity {
+  id: ID!
+  address: String!
+  tokensLocked: BigInt!
 }
 
