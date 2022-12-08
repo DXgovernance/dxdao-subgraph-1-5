@@ -1,0 +1,11 @@
+abis:
+  - DAOController
+  - Scheme
+entities:
+  - Scheme
+eventHandlers:
+  - event: RegisterScheme(indexed address,indexed address)
+    handler: handleRegisterScheme
+  - event: UnregisterScheme(indexed address,indexed address)
+    handler: handleunRegisterScheme
+

@@ -1,0 +1,16 @@
+type Scheme @entity {
+  id: ID!
+  name: String!
+  type: String!
+  avatar: String!
+  votingMachine: String!
+  controller: String!
+  permissionRegistry: String!
+  maxRepPercentageChange: BigInt!
+  paramsHash: Bytes
+  isRegistered: Boolean
+  canManageSchemes: Boolean
+  canMakeAvatarCalls: Boolean
+  canChangeReputation: Boolean
+}
+
