@@ -1,12 +1,17 @@
 {
   "private": {
-    "GuildRegistry": {
-      "address": "0xa19E7f8f6f064D1150c314897A32119d0299BA6b",
+    "PermissionRegistry": {
+      "address": "0xFc162f65e80B5d527cfF084715Eb385FF0F92C01",
       "startBlock": 1
     },
-    "PermissionRegistry": {
-      "address": "0x881C745d0E181656b8D8415D805f1e8104336127",
+    "DAOController": {
+      "address": "0x7c0935FCB3f8b01B168F2a08916F3844F379eB6c",
+      "startBlock": 1
+    },
+    "DAOAvatar": {
+      "address": "0x68Cf6A70e57eA62fF03Bd04F0625aeBf0f457596",
       "startBlock": 1
     }
   }
 }
+

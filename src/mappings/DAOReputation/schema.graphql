@@ -1,0 +1,6 @@
+type Member @entity {
+  id: ID!
+  address: String!
+  reputation: BigInt!
+}
+
