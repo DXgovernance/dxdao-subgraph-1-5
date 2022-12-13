@@ -1,0 +1,5 @@
+entities:
+  - Proposal
+eventHandlers:
+  - event: NewProposal(indexed bytes32,indexed address,uint256,address,bytes32)
+    handler: handleNewProposal

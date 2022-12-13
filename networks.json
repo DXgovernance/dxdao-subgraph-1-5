@@ -1,7 +1,7 @@
 {
   "private": {
     "PermissionRegistry": {
-      "address": "0x881C745d0E181656b8D8415D805f1e8104336127",
+      "address": "0xFc162f65e80B5d527cfF084715Eb385FF0F92C01",
       "startBlock": 1
     },
     "DAOController": {

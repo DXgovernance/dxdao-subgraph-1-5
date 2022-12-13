@@ -1,0 +1,56 @@
+type Proposal @entity {
+  id: ID!
+
+  # Schema properties
+  to: [String!]
+  callData: [String!]
+  value: [BigInt!]
+  totalOptions: BigInt
+  # ? ProposalState in the schema
+  title: String
+  descriptionHash: String
+  submittedTime: BigInt
+
+  # VotingMachine properties
+  schemeId: String
+  callbacks: String
+  state: ProposalState!
+  executionState: ExecutionState!
+  winningVote: BigInt
+  proposer: String
+  currentBoostedVotePeriodLimit: BigInt
+  paramsHash: String
+  daoBountyRemain: BigInt
+  daoBounty: BigInt
+  totalStakes: BigInt
+  confidenceThreshold: BigInt
+  secondsFromTimeOutTillExecuteBoosted: BigInt
+  boostedPhaseTime: BigInt
+  preBoostedPhaseTime: BigInt
+  daoRedeemItsWinnings: Boolean
+
+  # Related entities
+  voters: [Member!]
+}
+
+enum ProposalState {
+  None
+  Expired
+  ExecutedInQueue
+  ExecutedInBoost
+  Queued
+  PreBoosted
+  Boosted
+  QuietEndingPeriod
+}
+
+enum ExecutionState {
+  None
+  Failed
+  QueueBarCrossed
+  QueueTimeOut
+  PreBoostedBarCrossed
+  BoostedTimeOut
+  BoostedBarCrossed
+}
+
