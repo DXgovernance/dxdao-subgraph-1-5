@@ -8,7 +8,7 @@ import { Scheme, VotingMachine } from '../../types/schema';
 import { Scheme as SchemeContract } from '../../types/DAOController/Scheme';
 import { DXDVotingMachine as DXDVotingMachineContract } from '../../types/DAOController/DXDVotingMachine';
 
-import { DXDVotingMachine as DXDVotingMachineTemplate } from '../../types/templates';
+import { Scheme as SchemeTemplate } from '../../types/templates';
 
 export function handleRegisterScheme(event: RegisterScheme): void {
   const controllerAddress = event.address;
@@ -83,7 +83,7 @@ export function handleRegisterScheme(event: RegisterScheme): void {
 
   votingMachine.save();
 
-  DXDVotingMachineTemplate.create(votingMachineAddress);
+  SchemeTemplate.create(schemeAddress);
 }
 
 export function handleUnregisterScheme(event: UnregisterScheme): void {

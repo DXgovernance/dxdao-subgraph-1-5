@@ -4,13 +4,13 @@ import {
   Mint,
 } from '../../types/templates/DAOReputation/DAOReputation';
 import { Member } from '../../types/schema';
-import { BigInt } from '@graphprotocol/graph-ts';
+import { BigInt, store } from '@graphprotocol/graph-ts';
 
 export function handleMint(event: Mint): void {
   const tokenAddress = event.address;
   const repContract = DAOReputation.bind(tokenAddress);
 
-  const memberId = `${tokenAddress}-${event.params._to}`;
+  const memberId = `${tokenAddress.toHexString()}-${event.params._to.toHexString()}`;
   let member = Member.load(memberId);
 
   if (!member) {
@@ -36,7 +36,7 @@ export function handleBurn(event: Burn): void {
   member.reputation = reputation;
 
   if (reputation == new BigInt(0)) {
-    member.unset(memberId);
+    store.remove('Member', memberId);
   } else {
     member.save();
   }

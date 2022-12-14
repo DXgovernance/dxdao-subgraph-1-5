@@ -11,6 +11,10 @@
     "DAOAvatar": {
       "address": "0x68Cf6A70e57eA62fF03Bd04F0625aeBf0f457596",
       "startBlock": 1
+    },
+    "DAOReputation": {
+      "address": "0x2B84940935c6bC4ac5B3f37a78DBA102e7c23D64",
+      "startBlock": 1
     }
   }
 }
