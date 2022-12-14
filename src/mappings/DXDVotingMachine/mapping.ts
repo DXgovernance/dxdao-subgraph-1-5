@@ -10,6 +10,7 @@ export function handleNewProposal(event: NewProposal): void {
     DXDVotingMachineContract.bind(votingMachineAddress);
 
   const proposalData = votingMachineContract.proposals(proposalId);
+  const proposalTimes = votingMachineContract.getProposalTimes(proposalId);
 
   const proposal = new Proposal(proposalId.toHexString());
 
@@ -33,7 +34,8 @@ export function handleNewProposal(event: NewProposal): void {
   proposal.confidenceThreshold = proposalData.getConfidenceThreshold();
   proposal.secondsFromTimeOutTillExecuteBoosted =
     proposalData.getSecondsFromTimeOutTillExecuteBoosted();
-  proposal.boostedPhaseTime = proposalData.value12; // ! is an array but it seems we can't access its content
+  proposal.boostedPhaseTime = proposalTimes[1];
+  proposal.preBoostedPhaseTime = proposalTimes[2];
   proposal.daoRedeemItsWinnings = proposalData.getDaoRedeemItsWinnings();
 
   proposal.save();
