@@ -3,6 +3,7 @@ import { Stake, Vote, DAO } from '../../types/schema';
 import {
   VoteProposal,
   Stake as StakeEvent,
+  Redeem as RedeemEvent,
 } from '../../types/templates/DXDVotingMachine/DXDVotingMachine';
 
 export function handleVoteProposal(event: VoteProposal): void {
@@ -44,3 +45,13 @@ export function handleStake(event: StakeEvent): void {
   stake.save();
 }
 
+export function handleRedeem(event: RedeemEvent): void {
+  const stakeId = `${
+    event.params._proposalId
+  }-${event.params._beneficiary.toHexString()}`;
+  const stake = Stake.load(stakeId);
+  if (!stake) return;
+
+  stake.amount = stake.amount.minus(event.params._amount);
+  stake.save();
+}
