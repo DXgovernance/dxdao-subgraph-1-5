@@ -1,43 +1,57 @@
-import { log } from '@graphprotocol/graph-ts';
-import { Proposal } from '../../types/schema';
-import { DXDVotingMachine as DXDVotingMachineContract } from '../../types/templates/DXDVotingMachine/DXDVotingMachine';
-import { NewProposal } from '../../types/templates/DXDVotingMachine/DXDVotingMachine';
+import { BigInt } from '@graphprotocol/graph-ts';
+import { Stake, Vote, DAO } from '../../types/schema';
+import {
+  VoteProposal,
+  Stake as StakeEvent,
+  Redeem as RedeemEvent,
+} from '../../types/templates/DXDVotingMachine/DXDVotingMachine';
 
-export function handleNewProposal(event: NewProposal): void {
-  const votingMachineAddress = event.address;
-  const proposalId = event.params._proposalId;
-  const votingMachineContract =
-    DXDVotingMachineContract.bind(votingMachineAddress);
+export function handleVoteProposal(event: VoteProposal): void {
+  const voteId = `${event.params._proposalId.toHexString()}-${event.params._voter.toHexString()}`;
 
-  const proposalData = votingMachineContract.proposals(proposalId);
-  const proposalTimes = votingMachineContract.getProposalTimes(proposalId);
+  const avatarAddress = event.params._avatar;
+  const avatar = DAO.load(avatarAddress.toHexString());
+  if (!avatar) return;
 
-  const proposal = new Proposal(proposalId.toHexString());
+  let vote = Vote.load(voteId);
+  if (!vote) {
+    vote = new Vote(voteId);
+  }
 
-  // ! Scheme properties. Hardcoded
-  proposal.to = [];
-  proposal.callData = [];
-  proposal.value = [];
-
-  proposal.schemeId = proposalData.getSchemeId().toHexString();
-  proposal.callbacks = proposalData.getCallbacks().toHexString();
-  proposal.state = 'None'; //! hardcoded
-  proposal.executionState = 'None'; //! hardcoded
-  proposal.winningVote = proposalData.getWinningVote();
-  proposal.proposer = proposalData.getProposer().toHexString();
-  proposal.currentBoostedVotePeriodLimit =
-    proposalData.getCurrentBoostedVotePeriodLimit();
-  proposal.paramsHash = proposalData.getParamsHash().toHexString();
-  proposal.daoBountyRemain = proposalData.getDaoBountyRemain();
-  proposal.daoBounty = proposalData.getDaoBounty();
-  proposal.totalStakes = proposalData.getTotalStakes();
-  proposal.confidenceThreshold = proposalData.getConfidenceThreshold();
-  proposal.secondsFromTimeOutTillExecuteBoosted =
-    proposalData.getSecondsFromTimeOutTillExecuteBoosted();
-  proposal.boostedPhaseTime = proposalTimes[1];
-  proposal.preBoostedPhaseTime = proposalTimes[2];
-  proposal.daoRedeemItsWinnings = proposalData.getDaoRedeemItsWinnings();
-
-  proposal.save();
+  vote.proposal = event.params._proposalId.toHexString();
+  vote.member = `${
+    avatar.reputationToken
+  }-${event.params._voter.toHexString()}`;
+  vote.vote = event.params._vote;
+  vote.reputation = event.params._reputation;
+  vote.save();
 }
 
+export function handleStake(event: StakeEvent): void {
+  const stakeId = `${event.params._proposalId.toHexString()}-${event.params._staker.toHexString()}`;
+
+  let stake = Stake.load(stakeId);
+  if (!stake) {
+    stake = new Stake(stakeId);
+    stake.amount = new BigInt(0);
+  }
+
+  stake.proposal = event.params._proposalId.toHexString();
+  stake.avatar = event.params._avatar.toHexString();
+  stake.staker = event.params._staker.toHexString();
+  stake.vote = event.params._vote;
+  stake.amount = stake.amount.plus(event.params._amount);
+
+  stake.save();
+}
+
+export function handleRedeem(event: RedeemEvent): void {
+  const stakeId = `${
+    event.params._proposalId
+  }-${event.params._beneficiary.toHexString()}`;
+  const stake = Stake.load(stakeId);
+  if (!stake) return;
+
+  stake.amount = stake.amount.minus(event.params._amount);
+  stake.save();
+}

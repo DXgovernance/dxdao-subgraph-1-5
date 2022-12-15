@@ -2,7 +2,7 @@ type Scheme @entity {
   id: ID!
   name: String!
   type: String!
-  avatar: String!
+  avatar: DAO!
   votingMachine: String!
   controller: String!
   permissionRegistry: String!

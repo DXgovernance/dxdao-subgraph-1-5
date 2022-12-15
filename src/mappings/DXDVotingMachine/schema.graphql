@@ -1,56 +1,17 @@
-type Proposal @entity {
+type Vote @entity {
   id: ID!
-
-  # Schema properties
-  to: [String!]
-  callData: [String!]
-  value: [BigInt!]
-  totalOptions: BigInt
-  # ? ProposalState in the schema
-  title: String
-  descriptionHash: String
-  submittedTime: BigInt
-
-  # VotingMachine properties
-  schemeId: String
-  callbacks: String
-  state: ProposalState!
-  executionState: ExecutionState!
-  winningVote: BigInt
-  proposer: String
-  currentBoostedVotePeriodLimit: BigInt
-  paramsHash: String
-  daoBountyRemain: BigInt
-  daoBounty: BigInt
-  totalStakes: BigInt
-  confidenceThreshold: BigInt
-  secondsFromTimeOutTillExecuteBoosted: BigInt
-  boostedPhaseTime: BigInt
-  preBoostedPhaseTime: BigInt
-  daoRedeemItsWinnings: Boolean
-
-  # Related entities
-  voters: [Member!]
+  proposal: Proposal!
+  member: Member
+  vote: BigInt!
+  reputation: BigInt!
 }
 
-enum ProposalState {
-  None
-  Expired
-  ExecutedInQueue
-  ExecutedInBoost
-  Queued
-  PreBoosted
-  Boosted
-  QuietEndingPeriod
-}
-
-enum ExecutionState {
-  None
-  Failed
-  QueueBarCrossed
-  QueueTimeOut
-  PreBoostedBarCrossed
-  BoostedTimeOut
-  BoostedBarCrossed
+type Stake @entity {
+  id: ID!
+  proposal: Proposal!
+  avatar: String!
+  staker: String!
+  vote: BigInt!
+  amount: BigInt!
 }
 

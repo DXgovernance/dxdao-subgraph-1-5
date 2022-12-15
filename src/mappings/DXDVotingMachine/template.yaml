@@ -1,5 +1,14 @@
 entities:
   - Proposal
+  - Vote
+  - Stake
+  - Redeem
+  - DAO
 eventHandlers:
-  - event: NewProposal(indexed bytes32,indexed address,uint256,address,bytes32)
-    handler: handleNewProposal
+  - event: VoteProposal(indexed bytes32,indexed address,indexed address,uint256,uint256)
+    handler: handleVoteProposal
+  - event: Stake(indexed bytes32,indexed address,indexed address,uint256,uint256)
+    handler: handleStake
+  - event: Redeem(indexed bytes32,indexed address,indexed address,uint256)
+    handler: handleRedeem
+
