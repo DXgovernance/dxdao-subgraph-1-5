@@ -6,3 +6,12 @@ type Vote @entity {
   reputation: BigInt!
 }
 
+type Stake @entity {
+  id: ID!
+  proposal: Proposal!
+  avatar: String!
+  staker: String!
+  vote: BigInt!
+  amount: BigInt!
+}
+

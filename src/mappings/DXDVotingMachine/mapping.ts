@@ -1,8 +1,9 @@
+import { BigInt } from '@graphprotocol/graph-ts';
+import { Stake, Vote, DAO } from '../../types/schema';
 import {
   VoteProposal,
   Stake as StakeEvent,
 } from '../../types/templates/DXDVotingMachine/DXDVotingMachine';
-import { Stake, Vote, DAO } from '../../types/schema';
 
 export function handleVoteProposal(event: VoteProposal): void {
   const voteId = `${event.params._proposalId.toHexString()}-${event.params._voter.toHexString()}`;
@@ -23,5 +24,23 @@ export function handleVoteProposal(event: VoteProposal): void {
   vote.vote = event.params._vote;
   vote.reputation = event.params._reputation;
   vote.save();
+}
+
+export function handleStake(event: StakeEvent): void {
+  const stakeId = `${event.params._proposalId.toHexString()}-${event.params._staker.toHexString()}`;
+
+  let stake = Stake.load(stakeId);
+  if (!stake) {
+    stake = new Stake(stakeId);
+    stake.amount = new BigInt(0);
+  }
+
+  stake.proposal = event.params._proposalId.toHexString();
+  stake.avatar = event.params._avatar.toHexString();
+  stake.staker = event.params._staker.toHexString();
+  stake.vote = event.params._vote;
+  stake.amount = stake.amount.plus(event.params._amount);
+
+  stake.save();
 }
 
