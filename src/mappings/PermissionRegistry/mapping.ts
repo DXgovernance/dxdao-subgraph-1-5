@@ -1,7 +1,7 @@
 import { PermissionSet } from '../../types/PermissionRegistry/PermissionRegistry';
 import { Permission } from '../../types/schema';
 
-export function handleSetETHPermission(event: PermissionSet): void {
+export function handlePermissionSet(event: PermissionSet): void {
   const permissionId = `${event.params.from.toHexString()}-${event.params.to.toHexString()}-${event.params.functionSignature.toHexString()}`;
 
   let permission = Permission.load(permissionId);
