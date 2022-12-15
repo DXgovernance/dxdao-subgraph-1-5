@@ -14,7 +14,7 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   const dao = new DAO(daoId.toHexString());
   dao.controllerAddress = controllerAddress.toHexString();
 
-  if (repToken.reverted) dao.reputationToken = null;
+  if (repToken.reverted) return;
   else dao.reputationToken = repToken.value.toHexString();
 
   dao.save();
