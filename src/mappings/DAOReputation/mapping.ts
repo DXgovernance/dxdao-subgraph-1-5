@@ -35,10 +35,6 @@ export function handleBurn(event: Burn): void {
   const reputation = repContract.balanceOf(event.params._from);
   member.reputation = reputation;
 
-  if (reputation == new BigInt(0)) {
-    store.remove('Member', memberId);
-  } else {
-    member.save();
-  }
+  member.save();
 }
 

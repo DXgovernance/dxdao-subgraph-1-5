@@ -90,6 +90,7 @@ export function handleUnregisterScheme(event: UnregisterScheme): void {
   const schemeAddress = event.params._scheme.toHexString();
   const scheme = Scheme.load(schemeAddress);
   if (!scheme) return;
-  scheme.unset(schemeAddress);
+  scheme.isRegistered = false;
+  scheme.save();
 }
 
