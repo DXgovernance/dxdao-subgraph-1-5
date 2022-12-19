@@ -13,5 +13,17 @@ type Stake @entity {
   staker: String!
   vote: BigInt!
   amount: BigInt!
+  timestamp: BigInt!
+  txId: String!
+}
+
+type Redeem @entity {
+  id: ID!
+  proposal: Proposal!
+  avatar: String!
+  redeemer: String!
+  amount: BigInt!
+  timestamp: BigInt!
+  txId: String!
 }
 
