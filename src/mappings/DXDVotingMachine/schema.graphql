@@ -1,9 +1,19 @@
 type Vote @entity {
   id: ID!
   proposal: Proposal!
+  voterAddress: String!
   member: Member
   vote: BigInt!
   reputation: BigInt!
+  voteLogs: [VoteLog!] @derivedFrom(field: "vote")
+}
+
+type VoteLog @entity {
+  id: ID!
+  reputation: BigInt!
+  timestamp: BigInt!
+  txId: String!
+  vote: Vote!
 }
 
 type Stake @entity {
@@ -13,6 +23,7 @@ type Stake @entity {
   staker: String!
   vote: BigInt!
   amount: BigInt!
+
   timestamp: BigInt!
   txId: String!
 }
@@ -23,6 +34,7 @@ type Redeem @entity {
   avatar: String!
   redeemer: String!
   amount: BigInt!
+
   timestamp: BigInt!
   txId: String!
 }
