@@ -32,6 +32,25 @@ type Proposal @entity {
   # Related entities
   votes: [Vote!] @derivedFrom(field: "proposal")
   stakes: [Stake!] @derivedFrom(field: "proposal")
+  stateLogs: [StateLog!] @derivedFrom(field: "proposal")
+  votingMachineProposalStateLogs: [VotingMachineProposalStateLog!]
+    @derivedFrom(field: "proposal")
+}
+
+type StateLog @entity {
+  id: ID!
+  timestamp: BigInt!
+  txId: String!
+  state: ProposalState!
+  proposal: Proposal!
+}
+
+type VotingMachineProposalStateLog @entity {
+  id: ID!
+  timestamp: BigInt!
+  txId: String!
+  state: VotingMachineProposalState!
+  proposal: Proposal!
 }
 
 enum ProposalState {
