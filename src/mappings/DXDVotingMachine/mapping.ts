@@ -1,10 +1,29 @@
 import { BigInt } from '@graphprotocol/graph-ts';
-import { Stake, Vote, DAO, Redeem, VoteLog } from '../../types/schema';
+import {
+  Stake,
+  Vote,
+  DAO,
+  Redeem,
+  VoteLog,
+  VotingMachineProposalStateLog,
+} from '../../types/schema';
 import {
   VoteProposal,
   Stake as StakeEvent,
   Redeem as RedeemEvent,
 } from '../../types/templates/DXDVotingMachine/DXDVotingMachine';
+import { StateChange } from '../../types/templates/Scheme/DXDVotingMachine';
+
+const votingMachineProposalStateArray = [
+  'None',
+  'Expired',
+  'ExecutedInQueue',
+  'ExecutedInBoost',
+  'Queued',
+  'PreBoosted',
+  'Boosted',
+  'QuietEndingPeriod',
+];
 
 export function handleVoteProposal(event: VoteProposal): void {
   const proposalId = event.params._proposalId.toHexString();
@@ -88,5 +107,22 @@ export function handleRedeem(event: RedeemEvent): void {
   redeem.txId = event.transaction.hash.toHexString();
 
   redeem.save();
+}
+
+export function handleStateChange(event: StateChange): void {
+  // Proposal state
+  const proposalId = event.params._proposalId;
+  const votingMachineProposalStateLogId = `${proposalId.toHexString()}-${
+    votingMachineProposalStateArray[event.params._proposalState]
+  }-${event.block.timestamp}`;
+  const votingMachineProposalStateLog = new VotingMachineProposalStateLog(
+    votingMachineProposalStateLogId
+  );
+  votingMachineProposalStateLog.timestamp = event.block.timestamp;
+  votingMachineProposalStateLog.txId = event.transaction.hash.toHexString();
+  votingMachineProposalStateLog.state =
+    votingMachineProposalStateArray[event.params._proposalState];
+  votingMachineProposalStateLog.proposal = proposalId.toHexString();
+  votingMachineProposalStateLog.save();
 }
 

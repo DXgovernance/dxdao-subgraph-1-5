@@ -1,6 +1,10 @@
 import { Address, Bytes } from '@graphprotocol/graph-ts';
 import { ProposalStateChange } from '../../types/DAOController/Scheme';
-import { Proposal } from '../../types/schema';
+import {
+  Proposal,
+  StateLog,
+  VotingMachineProposalStateLog,
+} from '../../types/schema';
 import { Scheme as SchemeContract } from '../../types/templates/Scheme/Scheme';
 import { DXDVotingMachine as DXDVotingMachineContract } from '../../types/templates/Scheme/DXDVotingMachine';
 
@@ -50,8 +54,8 @@ export function handleProposalStateChange(event: ProposalStateChange): void {
   // Scheme data
 
   proposal.to = proposalDataFromScheme.to.map<string>(
-    (addres: Address): string => {
-      return addres.toHexString();
+    (address: Address): string => {
+      return address.toHexString();
     }
   );
 
@@ -99,8 +103,33 @@ export function handleProposalStateChange(event: ProposalStateChange): void {
   proposal.daoRedeemItsWinnings =
     proposalDataFromVotingMachine.getDaoRedeemItsWinnings();
 
-  // proposal.voters = [];
-
   proposal.save();
+
+  // State logs
+
+  const stateLogId = `${proposalId.toHexString()}-${
+    proposalStateArray[proposalDataFromScheme.state]
+  }-${event.block.timestamp}`;
+  const stateLog = new StateLog(stateLogId);
+  stateLog.timestamp = event.block.timestamp;
+  stateLog.txId = event.transaction.hash.toHexString();
+  stateLog.state = proposalStateArray[proposalDataFromScheme.state];
+  stateLog.proposal = proposalId.toHexString();
+  stateLog.save();
+
+  if (proposalStateArray[proposalDataFromScheme.state] === 'Submitted') {
+    const votingMachineProposalStateLogId = `${proposalId.toHexString()}-${
+      votingMachineProposalStateArray[proposalDataFromVotingMachine.getState()]
+    }-${event.block.timestamp}`;
+    const votingMachineProposalStateLog = new VotingMachineProposalStateLog(
+      votingMachineProposalStateLogId
+    );
+    votingMachineProposalStateLog.timestamp = event.block.timestamp;
+    votingMachineProposalStateLog.txId = event.transaction.hash.toHexString();
+    votingMachineProposalStateLog.state =
+      votingMachineProposalStateArray[proposalDataFromVotingMachine.getState()];
+    votingMachineProposalStateLog.proposal = proposalId.toHexString();
+    votingMachineProposalStateLog.save();
+  }
 }
 

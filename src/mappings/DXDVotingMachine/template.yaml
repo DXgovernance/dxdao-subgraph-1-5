@@ -11,4 +11,6 @@ eventHandlers:
     handler: handleStake
   - event: Redeem(indexed bytes32,indexed address,indexed address,uint256)
     handler: handleRedeem
+  - event: StateChange(indexed bytes32,uint8)
+    handler: handleStateChange
 
